@@ -1,0 +1,885 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Skeleton Loading Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.8s infinite;
+}
+
+/* Enhanced pulse animation for skeletons */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+    background-color: #f3f4f6;
+  }
+  50% {
+    opacity: 0.7;
+    background-color: #e5e7eb;
+  }
+}
+
+.animate-skeleton-pulse {
+  animation: skeleton-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dark mode skeleton pulse animation */
+@keyframes skeleton-pulse-dark {
+  0%, 100% {
+    opacity: 0.4;
+    background-color: #374151;
+  }
+  50% {
+    opacity: 0.7;
+    background-color: #4b5563;
+  }
+}
+
+.dark .animate-skeleton-pulse {
+  animation: skeleton-pulse-dark 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dark mode shimmer animation */
+@keyframes shimmer-dark {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0.3;
+  }
+}
+
+.dark .animate-shimmer {
+  animation: shimmer-dark 2s infinite;
+}
+
+/* Enhanced pulse for dark mode */
+@keyframes pulse-dark {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.dark .animate-pulse {
+  animation: pulse-dark 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Improved skeleton base styles */
+.skeleton-base {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.8s infinite;
+}
+
+/* Dark mode skeleton base */
+.dark .skeleton-base {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave-dark 2s infinite;
+}
+
+@keyframes skeleton-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes skeleton-wave-dark {
+  0% {
+    background-position: 200% 0;
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    background-position: -200% 0;
+    opacity: 0.4;
+  }
+}
+
+/* Global body styles */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+}
+
+/* Smooth scrolling for the entire document */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper scroll behavior for main content areas */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styles for better UX */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Dark mode scrollbar styles */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Ensure backdrop blur works on supported browsers */
+@supports (backdrop-filter: blur(8px)) {
+  .backdrop-blur-navbar {
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(8px)) {
+  .backdrop-blur-navbar {
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+}
+
+/* Smooth transitions for sidebar */
+.sidebar-transition {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus styles for better accessibility */
+.focus-ring:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Toast styling for dark mode */
+:root {
+  --toast-bg: #ffffff;
+  --toast-color: #1f2937;
+}
+
+.dark {
+  --toast-bg: #374151;
+  --toast-color: #f9fafb;
+}
+
+/* Dark mode toast overrides */
+.dark .Toaster__toast {
+  background: var(--toast-bg) !important;
+  color: var(--toast-color) !important;
+  border: 1px solid #4b5563;
+}
+
+.dark .Toaster__toast--success {
+  background: #065f46 !important;
+  color: #d1fae5 !important;
+}
+
+.dark .Toaster__toast--error {
+  background: #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+/* Enhanced UI Animations and Interactions */
+
+/* Base transition utility for consistent performance */
+.transition-base {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow, border-color, background-color, filter;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Base card styles */
+.card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.dark .card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+/* Hover and interaction animations */
+@keyframes gentle-scale {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.02); }
+}
+
+@keyframes gentle-glow {
+  0% { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+  100% { box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+}
+
+@keyframes gentle-glow-dark {
+  0% { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2); }
+  100% { box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3); }
+}
+
+@keyframes progress-fill {
+  0% { width: 0%; }
+  100% { width: var(--progress-width); }
+}
+
+@keyframes celebration-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+@keyframes pulse-success {
+  0%, 100% { background-color: rgb(34, 197, 94); }
+  50% { background-color: rgb(22, 163, 74); }
+}
+
+@keyframes slide-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Interactive card styles - Optimized for GPU acceleration */
+.interactive-card {
+  cursor: pointer;
+  position: relative;
+  border: 1px solid transparent;
+  /* Cross-browser hardware acceleration */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Prevent flickering in Safari and Arc */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Arc browser blur fix */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Firefox performance optimization */
+  -moz-transform-style: preserve-3d;
+  /* Chrome/Safari performance optimization */
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.card.interactive-card:hover,
+.interactive-card:hover {
+  /* Arc browser optimized transform */
+  transform: scale(1.02) translate3d(0, -1px, 0) !important;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+  background-color: rgba(59, 130, 246, 0.02) !important;
+  /* Optimized filter for Arc browser */
+  filter: brightness(1.05) contrast(1.02) !important;
+  /* Arc browser blur prevention */
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+.dark .card.interactive-card:hover,
+.dark .interactive-card:hover {
+  transform: scale(1.02) translate3d(0, -1px, 0) !important;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+  filter: brightness(1.08) contrast(1.02) !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Consolidated hover effects - Optimized for performance */
+.dashboard-card {
+  cursor: pointer;
+  /* Arc browser blur fix */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dashboard-card:hover {
+  transform: scale(1.02) translate3d(0, -1px, 0);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(59, 130, 246, 0.02);
+  filter: brightness(1.05) contrast(1.02);
+}
+
+.dark .dashboard-card:hover {
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.05);
+  filter: brightness(1.08) contrast(1.02);
+}
+
+/* Enhanced progress bar */
+.animated-progress {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: progress-fill 1s ease-out;
+}
+
+.animated-progress:hover {
+  transform: scaleY(1.1);
+}
+
+/* Budget celebration animation */
+.budget-celebration {
+  animation: celebration-bounce 0.6s ease-in-out;
+}
+
+.budget-success-pulse {
+  animation: pulse-success 2s infinite;
+}
+
+/* Tooltip styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 50;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: #f9fafb;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: normal; /* Allow text wrapping for better readability */
+  word-wrap: break-word;
+  transition: opacity 0.2s, visibility 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 200px;
+}
+
+/* Tooltip positioning adjustments for viewport containment */
+.tooltip .tooltip-content.tooltip-left {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+.tooltip .tooltip-content.tooltip-right {
+  left: 0;
+  right: auto;
+  transform: translateX(0);
+}
+
+.tooltip .tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dark .tooltip .tooltip-content {
+  background-color: #374151;
+  border: 1px solid #4b5563;
+}
+
+.dark .tooltip .tooltip-content::after {
+  border-color: #374151 transparent transparent transparent;
+}
+
+/* Enhanced tooltip container for better positioning */
+.tooltip-container {
+  position: relative;
+  overflow: visible;
+}
+
+/* Ensure tooltips don't cause horizontal scroll */
+.tooltip-no-overflow {
+  max-width: calc(100vw - 20px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Mobile tooltip adjustments */
+@media (max-width: 768px) {
+  .tooltip .tooltip-content {
+    max-width: calc(100vw - 40px);
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+/* Expandable card animations */
+.expandable-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.expandable-card.expanded {
+  animation: slide-in-up 0.3s ease-out;
+}
+
+/* Hover brightness effect - now integrated into interactive-card */
+.hover-brighten {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Interactive button enhancements */
+.btn-interactive {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-interactive:active {
+  transform: translateY(0);
+}
+
+/* Chart container enhancements */
+.chart-container {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.chart-container:hover {
+  transform: scale(1.01);
+}
+
+/* Transaction item hover effects */
+.transaction-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+}
+
+.transaction-item:hover {
+  background-color: rgba(59, 130, 246, 0.08);
+  transform: translateX(4px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.dark .transaction-item:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+/* Unified Hover Effect System - Budget Overview Pattern */
+
+/* Optimized hover glow system - GPU accelerated with Arc browser fix */
+.hover-glow {
+  cursor: pointer;
+  position: relative;
+  /* Arc browser blur fix */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.hover-glow:hover {
+  /* Optimized transform for Arc browser - avoid subpixel rendering issues */
+  transform: scale(1.02) translate3d(0, -1px, 0);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(59, 130, 246, 0.02);
+  /* Reduced brightness filter to minimize Arc browser blur */
+  filter: brightness(1.05) contrast(1.02);
+}
+
+.dark .hover-glow:hover {
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.05);
+  /* Adjusted for dark mode */
+  filter: brightness(1.08) contrast(1.02);
+}
+
+/* Subtle hover for smaller elements - Arc browser optimized */
+.hover-glow-subtle {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  will-change: transform, box-shadow, border-color, background-color;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hover-glow-subtle:hover {
+  /* Optimized for Arc browser */
+  transform: scale(1.01) translate3d(0, -0.5px, 0);
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(59, 130, 246, 0.01);
+}
+
+.dark .hover-glow-subtle:hover {
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.03);
+}
+
+/* Button hover enhancement */
+.btn-glow {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -4px rgba(59, 130, 246, 0.3);
+  filter: brightness(1.1);
+}
+
+.btn-glow:active {
+  transform: translateY(0);
+}
+
+/* Additional utility animations */
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out forwards;
+}
+
+/* Staggered animation delays */
+.animate-stagger-1 { animation-delay: 100ms; }
+.animate-stagger-2 { animation-delay: 200ms; }
+.animate-stagger-3 { animation-delay: 300ms; }
+.animate-stagger-4 { animation-delay: 400ms; }
+.animate-stagger-5 { animation-delay: 500ms; }
+
+/* Focus ring for better accessibility */
+.focus-ring-enhanced:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Enhanced card shadows */
+.card-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card-shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode card shadows */
+.dark .card-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .card-shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .card-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* Combined utility classes for better performance - inherits from .transition-base */
+
+/* Performance-optimized hover states */
+.transition-base.interactive-card:hover,
+.transition-base.dashboard-card:hover,
+.transition-base.hover-glow:hover {
+  transform: scale(1.02) translate3d(0, -1px, 0);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(59, 130, 246, 0.02);
+  filter: brightness(1.05) contrast(1.02);
+}
+
+.dark .transition-base.interactive-card:hover,
+.dark .transition-base.dashboard-card:hover,
+.dark .transition-base.hover-glow:hover {
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.05);
+  filter: brightness(1.08) contrast(1.02);
+}
+
+/* Universal Search Modal Animation */
+@keyframes searchModalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Search modal backdrop animation */
+@keyframes searchBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Universal Search Modal Spacing Variables */
+:root {
+  --navbar-height: 4rem; /* 64px - h-16 */
+  --search-modal-gap: 0.75rem; /* 12px gap from navbar */
+  --search-modal-gap-mobile: 0.5rem; /* 8px gap on mobile */
+}
+
+/* Search modal positioning utilities */
+.search-modal-positioned {
+  /* Calculate position based on navbar height + gap */
+  padding-top: calc(var(--navbar-height) + var(--search-modal-gap));
+}
+
+@media (max-width: 640px) {
+  .search-modal-positioned {
+    padding-top: calc(var(--navbar-height) + var(--search-modal-gap-mobile));
+  }
+}
+
+/* 🎯 AI TYPEWRITER FONT STYLING */
+
+/* Typewriter/monospace font for AI-generated content */
+.ai-typewriter-font {
+  font-family: 'Courier New', Consolas, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace;
+  font-feature-settings: "liga" 0; /* Disable ligatures for authentic typewriter feel */
+  letter-spacing: 0.025em; /* Slight letter spacing for better readability */
+  line-height: 1.6; /* Improved line height for readability */
+}
+
+/* Enhanced readability in light mode */
+.ai-typewriter-font {
+  color: #374151; /* Slightly darker gray for better contrast */
+}
+
+/* Enhanced readability in dark mode */
+.dark .ai-typewriter-font {
+  color: #d1d5db; /* Lighter gray for better contrast in dark mode */
+}
+
+/* Typewriter font for headers */
+.ai-typewriter-font.font-medium {
+  font-weight: 600; /* Slightly bolder for headers */
+  color: #111827; /* Darker for headers in light mode */
+}
+
+.dark .ai-typewriter-font.font-medium {
+  color: #f9fafb; /* Lighter for headers in dark mode */
+}
+
+/* 📝 AI PARAGRAPH FORMATTING */
+
+/* Section headers in AI insights */
+.ai-section-header h4 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dark .ai-section-header h4 {
+  color: #f3f4f6;
+}
+
+/* 🎨 FORM STYLING UTILITIES */
+
+/* Primary button styling */
+.btn-primary {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+}
+
+.dark .btn-primary {
+  @apply bg-blue-700 hover:bg-blue-800 focus:ring-offset-gray-800;
+}
+
+/* Input field styling */
+.input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white text-gray-900;
+}
+
+.dark .input {
+  @apply bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500;
+}
+
+/* Label styling */
+.label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.dark .label {
+  @apply text-gray-300;
+}
+
+/* Paragraph styling for AI insights */
+.ai-paragraph p {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Last paragraph spacing */
+.ai-paragraph:last-child p {
+  margin-bottom: 0;
+}
+
+/* Enhanced readability for AI content */
+.ai-content-container {
+  max-width: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Preserve existing mobile responsiveness */
+@media (max-width: 640px) {
+  .ai-typewriter-font {
+    font-size: 0.875rem; /* Slightly smaller on mobile for better fit */
+    letter-spacing: 0.015em; /* Reduced letter spacing on mobile */
+  }
+
+  .ai-paragraph p {
+    text-align: left; /* Remove justify on mobile for better readability */
+    hyphens: none;
+  }
+}
+
+/* Mobile-specific enhancements for Income and Expenses pages */
+@media (max-width: 1024px) {
+  /* Ensure proper touch targets on mobile */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve card spacing on mobile */
+  .mobile-card-spacing {
+    padding: 1rem;
+  }
+
+  /* Better text readability on mobile */
+  .mobile-text-base {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Optimize button sizes for mobile */
+  .mobile-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 641px) and (max-width: 1023px) {
+  /* Show condensed table view on tablets */
+  .tablet-condensed-table th,
+  .tablet-condensed-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Enhanced mobile card hover states */
+@media (hover: hover) and (pointer: fine) {
+  /* Only apply hover effects on devices that support hover */
+  .mobile-card:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+@media (max-width: 768px) {
+  .mobile-no-scroll {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Ensure proper spacing for mobile forms */
+  .mobile-form-spacing {
+    gap: 1rem;
+  }
+
+  /* Better mobile typography */
+  .mobile-heading {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .mobile-subheading {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+}

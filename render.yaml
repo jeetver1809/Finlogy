@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: finlogy-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: finlogy-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+
+databases:
+  - name: finlogy-db
+    databaseName: finlogy
+    user: finlogy_user
+    plan: free
