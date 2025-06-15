@@ -10,10 +10,20 @@
     "build": "cd frontend && npm run build",
     "install-deps": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
-  "keywords": ["finance", "tracker", "mern", "react", "nodejs", "mongodb"],
+  "keywords": [
+    "finance",
+    "tracker",
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "terser": "^5.42.0"
   }
 }
