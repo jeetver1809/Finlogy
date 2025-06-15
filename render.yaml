@@ -24,3 +24,15 @@ databases:
     databaseName: finlogy
     user: finlogy_user
     plan: free
+
+    services:
+  - type: web
+    name: finlogy-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://your-backend-url.herokuapp.com/api
+      - key: VITE_APP_NAME
+        value: Finlogy
