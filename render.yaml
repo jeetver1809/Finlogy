@@ -18,6 +18,23 @@ services:
         generateValue: true
       - key: SESSION_SECRET
         generateValue: true
+      - key: CLIENT_URL
+        value: https://finlogy.onrender.com  # Update with your frontend URL
+
+  # Frontend static site
+  - type: web
+    name: finlogy-frontend
+    env: static
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://finlogy-backend.onrender.com/api  # Update with your backend URL
+      - key: VITE_APP_NAME
+        value: Finlogy
 
 databases:
   - name: finlogy-db
