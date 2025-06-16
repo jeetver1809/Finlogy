@@ -45,7 +45,7 @@ const corsOptions = {
       'http://127.0.0.1:5174',
       'http://127.0.0.1:5001',
       // Add your Vercel frontend URL here after deployment
-      'https://your-vercel-app.vercel.app'
+      'https://finlogy-frontend.onrender.com'
     ].filter(Boolean); // Remove any undefined values
 
     // Allow all subdomains of localhost in development
