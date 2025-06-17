@@ -19,7 +19,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: CLIENT_URL
-        value: https://finlogy.onrender.com  # Update with your frontend URL
+        value: https://finlogy-frontend.onrender.com # Correct frontend URL
 
   # Frontend static site
   - type: web
@@ -30,9 +30,13 @@ services:
       npm install
       npm run build
     staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://finlogy-backend.onrender.com/api  # Update with your backend URL
+        value: https://finlogy.onrender.com # Correct backend URL
       - key: VITE_APP_NAME
         value: Finlogy
 
@@ -41,15 +45,3 @@ databases:
     databaseName: finlogy
     user: finlogy_user
     plan: free
-
-    services:
-  - type: web
-    name: finlogy-frontend
-    env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://your-backend-url.herokuapp.com/api
-      - key: VITE_APP_NAME
-        value: Finlogy
