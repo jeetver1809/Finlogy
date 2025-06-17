@@ -102,13 +102,17 @@ app.use(cors(corsOptions));
 // ========================
 // Security Headers
 // ========================
-const securityHeaders = {
+
+// Security headers configuration
+const securityHeaders = [
   // Basic security headers
-  crossOriginResourcePolicy: { policy: 'same-site' },
-  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
-  crossOriginEmbedderPolicy: false, // Disable if not using SharedArrayBuffer
-  contentSecurityPolicy: {
-    useDefaults: false,
+  helmet.crossOriginResourcePolicy({ policy: 'same-site' }),
+  helmet.crossOriginOpenerPolicy({ policy: 'same-origin-allow-popups' }),
+  helmet.crossOriginEmbedderPolicy(),
+  
+  // Content Security Policy
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: [
@@ -140,7 +144,7 @@ const securityHeaders = {
       ],
       connectSrc: [
         "'self'",
-        process.env.CLIENT_URL,
+        process.env.CLIENT_URL || 'https://finlogy-frontend.onrender.com',
         'https://accounts.google.com',
         'https://oauth2.googleapis.com',
         'https://www.googleapis.com',
@@ -158,27 +162,26 @@ const securityHeaders = {
       baseUri: ["'self'"],
       formAction: ["'self'"],
       frameAncestors: ["'self'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
-      blockAllMixedContent: process.env.NODE_ENV === 'production',
-      requireTrustedTypesFor: ["'script'"]
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
     }
-  },
-  dnsPrefetchControl: { allow: false },
-  frameguard: { action: 'deny' },
-  hsts: {
+  }),
+
+  // Other security headers
+  helmet.dnsPrefetchControl({ allow: false }),
+  helmet.frameguard({ action: 'deny' }),
+  helmet.hsts({
     maxAge: 63072000, // 2 years in seconds
     includeSubDomains: true,
     preload: true
-  },
-  ieNoOpen: true,
-  noSniff: true,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  xssFilter: true,
-  hidePoweredBy: true
-};
+  }),
+  helmet.ieNoOpen(),
+  helmet.noSniff(),
+  helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }),
+  helmet.xssFilter()
+];
 
-// Apply security headers
-app.use(helmet(securityHeaders));
+// Apply all security headers
+app.use(securityHeaders);
 
 // Trust first proxy (important for HTTPS in production)
 app.set('trust proxy', 1);
