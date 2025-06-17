@@ -25,9 +25,11 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// CORS configuration - MUST come before rate limiting and other middleware
+// ========================
+// CORS Configuration
+// ========================
 const corsOptions = {
-  origin: function (origin, callback) {
+  origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       console.log('✅ CORS: No origin (non-browser request)');
@@ -36,65 +38,77 @@ const corsOptions = {
 
     const allowedOrigins = [
       process.env.CLIENT_URL,
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:5174',
-      'http://127.0.0.1:5001',
-      // Add your Vercel frontend URL here after deployment
+      // Development URLs
+      ...(process.env.NODE_ENV === 'development' ? [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:5176',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5001'
+      ] : []),
+      // Production frontend URL
       'https://finlogy-frontend.onrender.com'
-    ].filter(Boolean); // Remove any undefined values
+    ].filter(Boolean);
 
     // Allow all subdomains of localhost in development
     if (process.env.NODE_ENV === 'development' && 
-        (origin.match(/^https?:\/\/localhost(:[0-9]+)?$/) || 
-         origin.match(/^https?:\/\/127\.0\.0\.1(:[0-9]+)?$/))) {
+        (origin.match(/^https?:\/\/localhost(:\d+)?$/) || 
+         origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/))) {
       console.log(`✅ CORS: Allowing localhost origin: ${origin}`);
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
-      console.log(`✅ CORS: Allowing whitelisted origin: ${origin}`);
+    if (allowedOrigins.some(allowedOrigin => 
+      origin === allowedOrigin || 
+      origin.startsWith(allowedOrigin.replace(/\*$/, ''))
+    )) {
+      console.log(`✅ CORS: Allowing origin: ${origin}`);
       return callback(null, true);
     }
 
     console.log(`❌ CORS: Blocking origin: ${origin}`);
-    console.log('Allowed origins:', allowedOrigins);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Origin',
     'X-Requested-With',
     'Content-Type',
     'Accept',
     'Authorization',
-    'Cache-Control',
-    'Pragma'
+    'X-Request-ID',
+    'X-Forwarded-For',
+    'X-Forwarded-Proto',
+    'X-Forwarded-Port'
   ],
-  exposedHeaders: ['Authorization', 'Content-Length', 'X-Foo', 'X-Bar'],
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  exposedHeaders: [
+    'Content-Length',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset'
+  ],
+  maxAge: 86400, // 24 hours
   preflightContinue: false,
-  maxAge: 86400 // 24 hours
+  optionsSuccessStatus: 204
 };
 
 // Apply CORS with the above configuration
 app.use(cors(corsOptions));
 
-// Handle preflight requests for all routes
-app.options('*', cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options('*', cors(corsOptions));
-
-// Security middleware with CSP for Google OAuth
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+// ========================
+// Security Headers
+// ========================
+const securityHeaders = {
+  // Basic security headers
+  crossOriginResourcePolicy: { policy: 'same-site' },
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  crossOriginEmbedderPolicy: false, // Disable if not using SharedArrayBuffer
   contentSecurityPolicy: {
+    useDefaults: false,
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: [
@@ -103,62 +117,123 @@ app.use(helmet({
         "'unsafe-eval'",
         "https://accounts.google.com",
         "https://apis.google.com",
-        "https://www.google.com"
-      ],
-      connectSrc: [
-        "'self'",
-        "https://accounts.google.com",
-        "https://oauth2.googleapis.com",
-        "https://www.googleapis.com"
-      ],
-      frameSrc: [
-        "'self'",
-        "https://accounts.google.com",
-        "https://apis.google.com"
+        "https://www.google.com",
+        "https://www.gstatic.com"
       ],
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
         "https://fonts.googleapis.com"
       ],
-      fontSrc: ["'self'"],
-      imgSrc: ["'self'"],
-    },
+      imgSrc: [
+        "'self'",
+        'data:',
+        'blob:',
+        'https:',
+        'http:'
+      ],
+      fontSrc: [
+        "'self'",
+        'data:',
+        'https://fonts.gstatic.com',
+        'https://fonts.googleapis.com'
+      ],
+      connectSrc: [
+        "'self'",
+        process.env.CLIENT_URL,
+        'https://accounts.google.com',
+        'https://oauth2.googleapis.com',
+        'https://www.googleapis.com',
+        'wss://*.google.com',
+        'ws://localhost:*',
+        'ws://127.0.0.1:*'
+      ],
+      frameSrc: [
+        "'self'",
+        'https://accounts.google.com',
+        'https://apis.google.com',
+        'https://www.google.com'
+      ],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      blockAllMixedContent: process.env.NODE_ENV === 'production',
+      requireTrustedTypesFor: ["'script'"]
+    }
   },
-}));
+  dnsPrefetchControl: { allow: false },
+  frameguard: { action: 'deny' },
+  hsts: {
+    maxAge: 63072000, // 2 years in seconds
+    includeSubDomains: true,
+    preload: true
+  },
+  ieNoOpen: true,
+  noSniff: true,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xssFilter: true,
+  hidePoweredBy: true
+};
 
-// Rate limiting - More permissive for development
-const limiter = rateLimit({
+// Apply security headers
+app.use(helmet(securityHeaders));
+
+// Trust first proxy (important for HTTPS in production)
+app.set('trust proxy', 1);
+
+// ========================
+// Rate Limiting
+// ========================
+const rateLimitConfig = {
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // Increased to 1000 for development
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  max: process.env.NODE_ENV === 'production' 
+    ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100 
+    : 1000, // More lenient in development
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: JSON.stringify({
+    success: false,
+    error: 'Too many requests, please try again later.'
+  }),
   skip: (req) => {
-    // Skip rate limiting for:
-    // 1. OPTIONS requests (CORS preflight)
-    // 2. OAuth callback endpoints
-    // 3. Health check endpoint
+    // Skip rate limiting for health checks and static files
     const skipPaths = [
-      '/api/auth/google',
-      '/api/auth/google/callback',
-      '/api/auth/oauth/success',
-      '/api/auth/oauth/failure',
-      '/api/health'
+      '/health',
+      '/api/health',
+      '/favicon.ico',
+      /^\/static\//,
+      /\.(js|css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$/i
     ];
     
-    return req.method === 'OPTIONS' || 
-           skipPaths.some(path => req.path.startsWith(path));
+    return skipPaths.some(path => 
+      typeof path === 'string' 
+        ? req.path === path 
+        : path.test(req.path)
+    ) || req.method === 'OPTIONS';
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests, please try again later.',
+      retryAfter: Math.ceil(rateLimitConfig.windowMs / 1000)
+    });
   }
-});
-app.use('/api/', limiter);
+};
+
+const limiter = rateLimit(rateLimitConfig);
+app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session configuration for OAuth with MongoDB store
+// ========================
+// Session Configuration
+// ========================
 let sessionStore;
+
 try {
   if (!process.env.MONGODB_URI) {
     console.warn('⚠️  MONGODB_URI is not set. Using in-memory session store (not recommended for production).');
@@ -167,12 +242,24 @@ try {
       mongoUrl: process.env.MONGODB_URI,
       collectionName: 'sessions',
       autoRemove: 'interval',
-      autoRemoveInterval: 60 * 24, // Remove expired sessions every 24 hours
-      ttl: 24 * 60 * 60, // Session TTL: 24 hours in seconds
-      touchAfter: 12 * 3600, // Time period in seconds to resave the session to the store
+      autoRemoveInterval: 10, // Check every 10 minutes
+      ttl: 7 * 24 * 60 * 60, // 7 days in seconds
+      touchAfter: 3 * 3600, // 3 hours in seconds
+      crypto: {
+        secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production'
+      },
       mongoOptions: {
         retryWrites: true,
-        w: 'majority'
+        w: 'majority',
+        retryReads: true,
+        readPreference: 'primary',
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        serverSelectionTimeoutMS: 5000,
+        heartbeatFrequencyMS: 10000,
+        maxPoolSize: 10,
+        minPoolSize: 1,
+        maxIdleTimeMS: 30000
       }
     });
     
@@ -190,19 +277,62 @@ try {
   process.exit(1);
 }
 
-app.use(session({
+// Session configuration
+const sessionConfig = {
+  name: 'finlogy.sid',
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   store: process.env.MONGODB_URI ? sessionStore : new session.MemoryStore(),
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/',
+    domain: process.env.NODE_ENV === 'production' 
+      ? new URL(process.env.CLIENT_URL || 'https://finlogy-frontend.onrender.com').hostname 
+      : undefined,
+    // Add these for additional security
+    secureProxy: process.env.NODE_ENV === 'production',
+    signed: true
   },
-  proxy: process.env.NODE_ENV === 'production' // Trust the reverse proxy in production
-}));
+  proxy: process.env.NODE_ENV === 'production',
+  rolling: true, // Reset the cookie Max-Age on every request
+  unset: 'destroy', // Delete the session when unset
+  genid: (req) => {
+    // Generate a secure session ID
+    return require('crypto').randomBytes(16).toString('hex');
+  }
+};
+
+// Apply session middleware
+app.use(session(sessionConfig));
+
+// Add request ID to each request for better logging
+app.use((req, res, next) => {
+  req.id = require('crypto').randomBytes(16).toString('hex');
+  next();
+});
+
+// Add request logging
+app.use((req, res, next) => {
+  const start = Date.now();
+  const { method, originalUrl, ip, id } = req;
+  
+  res.on('finish', () => {
+    const { statusCode } = res;
+    const contentLength = res.get('content-length');
+    const responseTime = Date.now() - start;
+    
+    console.log(
+      `${new Date().toISOString()} [${id}] ${method} ${originalUrl} ` +
+      `${statusCode} ${contentLength || 0}b ${responseTime}ms - ${ip}`
+    );
+  });
+  
+  next();
+});
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -252,7 +382,60 @@ const connectToMongoDB = async () => {
 // Initialize MongoDB connection
 connectToMongoDB();
 
-// Routes
+// ========================
+// Health Check Endpoint
+// ========================
+app.get('/api/health', async (req, res) => {
+  const healthcheck = {
+    status: 'UP',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    node: {
+      version: process.version,
+      platform: process.platform,
+      arch: process.arch
+    },
+    system: {
+      hostname: require('os').hostname(),
+      loadavg: require('os').loadavg(),
+      freemem: require('os').freemem(),
+      totalmem: require('os').totalmem(),
+      cpus: require('os').cpus().length
+    },
+    env: process.env.NODE_ENV || 'development',
+    db: {
+      status: 'unknown'
+    }
+  };
+
+  // Check database connection if MongoDB URI is set
+  if (process.env.MONGODB_URI) {
+    try {
+      const dbStatus = await mongoose.connection.db.admin().ping();
+      healthcheck.db = {
+        status: 'connected',
+        host: mongoose.connection.host,
+        name: mongoose.connection.name,
+        ping: dbStatus,
+        collections: (await mongoose.connection.db.listCollections().toArray()).map(c => c.name)
+      };
+    } catch (error) {
+      healthcheck.db = {
+        status: 'error',
+        error: error.message
+      };
+      healthcheck.status = 'DOWN';
+    }
+  }
+
+  const status = healthcheck.status === 'UP' ? 200 : 503;
+  res.status(status).json(healthcheck);
+});
+
+// ========================
+// Application Routes
+// ========================
 app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/income', incomeRoutes);
@@ -261,17 +444,12 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Finance Tracker API is running',
-    timestamp: new Date().toISOString(),
-  });
-});
+// ========================
+// Error Handling Middleware
+// ========================
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 Handler
+app.use((req, res, next) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
