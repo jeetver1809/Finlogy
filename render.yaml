@@ -19,7 +19,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: CLIENT_URL
-        value: https://finlogy-frontend.onrender.com # Correct frontend URL
+        value: https://finlogy-frontend.onrender.com
 
   # Frontend static site
   - type: web
@@ -36,7 +36,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://finlogy.onrender.com # Correct backend URL
+        value: https://finlogy.onrender.com/api
       - key: VITE_APP_NAME
         value: Finlogy
 

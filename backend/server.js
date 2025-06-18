@@ -290,12 +290,11 @@ const sessionConfig = {
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-    domain: process.env.NODE_ENV === 'production' 
-      ? new URL(process.env.CLIENT_URL || 'https://finlogy-frontend.onrender.com').hostname 
-      : undefined,
+    // Remove domain restriction for cross-origin requests
+    domain: undefined,
     // Add these for additional security
     secureProxy: process.env.NODE_ENV === 'production',
     signed: true

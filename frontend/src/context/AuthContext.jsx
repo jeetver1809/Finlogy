@@ -202,8 +202,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const initiateOAuth = (provider) => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  window.location.href = `${baseUrl}/api/auth/${provider}`;
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+  window.location.href = `${baseUrl}/auth/${provider}`;
 };
 
   const value = {
